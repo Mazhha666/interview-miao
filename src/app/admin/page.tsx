@@ -2,6 +2,6 @@ import './index.css'
 
 export default function Homepage() {
   return (
-    <div id='homePage'>banks</div>
+    <div id='homePage'>admin</div>
   );
 }

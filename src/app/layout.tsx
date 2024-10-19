@@ -7,6 +7,8 @@ import { Provider, useDispatch } from "react-redux";
 import store, { AppDispatch } from "@/stores";
 import { getLoginUserUsingGet } from "@/api/userController";
 import { setLoginUser } from "@/stores/loginUser";
+import AccessLayout from "@/access/AccessLayout";
+import ACCESS_ENUM from "@/access/accessEnum";
 /**
  *
  * @param InitLayout 初始化参数 高阶组件用法
@@ -18,17 +20,22 @@ const InitLayout: React.FC<
   }>
 > = ({ children }) => {
   //获取redux触发器
-  const dispatch = useDispatch<AppDispatch>()
+  const dispatch = useDispatch<AppDispatch>();
   //储存函数 初始化全局用户状态
-  const doInitLoginUser = useCallback(async() => {
-    const res = await getLoginUserUsingGet()
-    if(res.data){
+  const doInitLoginUser = useCallback(async () => {
+    const res = await getLoginUserUsingGet();
+    if (res.data) {
       //更新全局用户状态
-    }else{
-      setTimeout(() => {
-        const testUser = {userName:'测试',id:1,userAvatar:'https:www.code-nav.cn/logo.png'}
-        dispatch(setLoginUser(testUser))
-      },3000)
+    } else {
+      // setTimeout(() => {
+      //   const testUser = {
+      //     userName: "测试",
+      //     id: 1,
+      //     userAvatar: "https:www.code-nav.cn/logo.png",
+      //     userRole:ACCESS_ENUM.ADMIN
+      //   };
+      //   dispatch(setLoginUser(testUser));
+      // }, 3000);
     }
   }, []);
   //只执行一次hook
@@ -49,7 +56,9 @@ export default function RootLayout({
         <AntdRegistry>
           <Provider store={store}>
             <InitLayout>
-              <BasicLayout>{children}</BasicLayout>
+              <BasicLayout>
+                <AccessLayout>{children}</AccessLayout>
+              </BasicLayout>
             </InitLayout>
           </Provider>
         </AntdRegistry>

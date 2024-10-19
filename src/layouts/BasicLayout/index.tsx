@@ -9,13 +9,15 @@ import { Dropdown, Input, theme } from "antd";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React from "react";
+import React, { useState } from "react";
 import "./index.css";
 import GlobalFooter from "@/app/components/GlobalFooter";
 import menus from "../../../config/menu";
 import { useSelector } from "react-redux";
 import { RootState } from "@/stores";
-
+import getAccessibleMenus from "@/access/menuAccess";
+import MdEditor from "@/app/components/MdEditor";
+import MdViewer from "@/app/components/MdViewer";
 
 const SearchInput = () => {
   const { token } = theme.useToken();
@@ -56,13 +58,14 @@ interface Props {
   children: React.ReactNode;
 }
 /**
- * 
+ *
  * @param 基本布局页面
- * @returns 
+ * @returns
  */
 export default function BasicLayout({ children }: Props) {
   const pathname = usePathname();
-  const loginUser = useSelector((state:RootState) => state.loginUser)
+  const loginUser = useSelector((state: RootState) => state.loginUser);
+  // const [text,setText] = useState<string>("")//搜索框内容
   return (
     <div
       id="basicLayout"
@@ -127,8 +130,7 @@ export default function BasicLayout({ children }: Props) {
               {logo}
               {title}
             </a>
-          )
-      
+          );
         }}
         //渲染底部
         footerRender={() => {
@@ -137,7 +139,7 @@ export default function BasicLayout({ children }: Props) {
         onMenuHeaderClick={(e) => console.log(e)}
         //定义有哪些菜单
         menuDataRender={() => {
-          return menus
+          return getAccessibleMenus(loginUser, menus);
         }}
         //定义了菜单项如何渲染
         menuItemRender={(item, dom) => (
@@ -146,6 +148,7 @@ export default function BasicLayout({ children }: Props) {
           </Link>
         )}
       >
+
         {children}
       </ProLayout>
     </div>
