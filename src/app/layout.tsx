@@ -1,14 +1,14 @@
 "use client";
-import { AntdRegistry } from "@ant-design/nextjs-registry";
-import "./globals.css";
+import AccessLayout from "@/access/AccessLayout";
+import { getLoginUserUsingGet } from "@/api/userController";
 import BasicLayout from "@/layouts/BasicLayout";
+import store, { AppDispatch } from "@/stores";
+import { setLoginUser } from "@/stores/loginUser";
+import { AntdRegistry } from "@ant-design/nextjs-registry";
+import { AxiosResponse } from "axios";
 import React, { useCallback, useEffect } from "react";
 import { Provider, useDispatch } from "react-redux";
-import store, { AppDispatch } from "@/stores";
-import { getLoginUserUsingGet } from "@/api/userController";
-import { setLoginUser } from "@/stores/loginUser";
-import AccessLayout from "@/access/AccessLayout";
-import ACCESS_ENUM from "@/access/accessEnum";
+import "./globals.css";
 /**
  *
  * @param InitLayout 初始化参数 高阶组件用法
@@ -23,9 +23,10 @@ const InitLayout: React.FC<
   const dispatch = useDispatch<AppDispatch>();
   //储存函数 初始化全局用户状态
   const doInitLoginUser = useCallback(async () => {
-    const res = await getLoginUserUsingGet();
+    const res:AxiosResponse = await getLoginUserUsingGet();
     if (res.data) {
       //更新全局用户状态
+      dispatch(setLoginUser(res.data));
     } else {
       // setTimeout(() => {
       //   const testUser = {

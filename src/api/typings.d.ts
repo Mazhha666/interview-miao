@@ -516,9 +516,12 @@ declare namespace API {
 
   type QuestionBankUpdateRequest = {
     content?: string;
+    description?: string;
     id?: number;
+    picture?: string;
     tags?: string[];
     title?: string;
+    userId?: number;
   };
 
   type QuestionBankVO = {
@@ -526,7 +529,7 @@ declare namespace API {
     description?: string;
     id?: number;
     picture?: string;
-    questionPage?: PageQuestion_;
+    questionPage?: PageQuestionVO_;
     title?: string;
     updateTime?: string;
     user?: UserVO;
@@ -558,10 +561,12 @@ declare namespace API {
   };
 
   type QuestionUpdateRequest = {
-    description?: string;
+    answer?: string;
+    content?: string;
     id?: number;
-    picture?: string;
+    tags?: string[];
     title?: string;
+    userId?: number;
   };
 
   type QuestionVO = {

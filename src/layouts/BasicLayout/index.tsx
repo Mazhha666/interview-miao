@@ -1,59 +1,27 @@
 "use client";
+import getAccessibleMenus from "@/access/menuAccess";
+import GlobalFooter from "@/app/components/GlobalFooter";
+import { AppDispatch, RootState } from "@/stores";
 import {
   GithubFilled,
   LogoutOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
 import { ProLayout } from "@ant-design/pro-components";
-import { Dropdown, Input, theme } from "antd";
+import { Dropdown, Input, message, theme } from "antd";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React, { useState } from "react";
-import "./index.css";
-import GlobalFooter from "@/app/components/GlobalFooter";
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
 import menus from "../../../config/menu";
-import { useSelector } from "react-redux";
-import { RootState } from "@/stores";
-import getAccessibleMenus from "@/access/menuAccess";
-import MdEditor from "@/app/components/MdEditor";
-import MdViewer from "@/app/components/MdViewer";
+import "./index.css";
+import { userLogoutUsingPost } from "@/api/userController";
+import { DEFAULT_USER } from "@/constants/user";
+import { setLoginUser } from "@/stores/loginUser";
+import { useRouter } from "next/navigation";
+import SearchInput from "./components/SearchInput/page";
 
-const SearchInput = () => {
-  const { token } = theme.useToken();
-  return (
-    <div
-      key="SearchOutlined"
-      aria-hidden
-      style={{
-        display: "flex",
-        alignItems: "center",
-        marginInlineEnd: 24,
-      }}
-      onMouseDown={(e) => {
-        e.stopPropagation();
-        e.preventDefault();
-      }}
-    >
-      <Input
-        style={{
-          borderRadius: 4,
-          marginInlineEnd: 12,
-          backgroundColor: token.colorBgTextHover,
-        }}
-        prefix={
-          <SearchOutlined
-            style={{
-              color: token.colorTextLightSolid,
-            }}
-          />
-        }
-        placeholder="搜索题目"
-        variant="borderless"
-      />
-    </div>
-  );
-};
 interface Props {
   children: React.ReactNode;
 }
@@ -64,7 +32,21 @@ interface Props {
  */
 export default function BasicLayout({ children }: Props) {
   const pathname = usePathname();
+
   const loginUser = useSelector((state: RootState) => state.loginUser);
+  const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter();
+  const doUserLogout = async () => {
+    try {
+      await userLogoutUsingPost();
+      message.success("登陆成功");
+      dispatch(setLoginUser(DEFAULT_USER));
+      //跳转
+      router.push("/user/login");
+    } catch (e: any) {
+      message.error("登陆失败" + e.message);
+    }
+  };
   // const [text,setText] = useState<string>("")//搜索框内容
   return (
     <div
@@ -94,6 +76,17 @@ export default function BasicLayout({ children }: Props) {
           size: "small",
           title: loginUser.userName || "喵喵",
           render: (props, dom) => {
+            if (!loginUser.id) {
+              return (
+                <div
+                  onClick={() => {
+                    router.push("/user/login");
+                  }}
+                >
+                  {dom}
+                </div>
+              );
+            }
             return (
               <Dropdown
                 menu={{
@@ -104,6 +97,12 @@ export default function BasicLayout({ children }: Props) {
                       label: "退出登录",
                     },
                   ],
+                  onClick: async (event: { key: React.Key }) => {
+                    const { key } = event;
+                    if (key === "logout") {
+                      doUserLogout();
+                    }
+                  },
                 }}
               >
                 {dom}
@@ -114,7 +113,9 @@ export default function BasicLayout({ children }: Props) {
         actionsRender={(props) => {
           if (props.isMobile) return [];
           return [
-            <SearchInput key="search" />,
+            //搜题的判断显示
+
+            <SearchInput key="search" currentPath={pathname} />,
             <a
               key="github"
               href="https://github.com/Mazhha666/interview-miao"
@@ -148,7 +149,6 @@ export default function BasicLayout({ children }: Props) {
           </Link>
         )}
       >
-
         {children}
       </ProLayout>
     </div>
